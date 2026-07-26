@@ -1,0 +1,4 @@
+python-dotenv
+cassandra-driver==3.29.1
+elasticsearch==8.11.0
+groq

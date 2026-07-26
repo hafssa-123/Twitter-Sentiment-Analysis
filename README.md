@@ -8,7 +8,8 @@
 ```
 twitter-analysis/
 ├── docker-compose.yml          ← Tous les services
-├── .env                        ← Configuration (clés API, etc.)
+├── .env                        ← Configuration (clés API, etc.) — NON versionné (voir .gitignore)
+├── .gitignore                  ← Fichiers exclus du dépôt (.env, etc.)
 ├── setup_kibana.sh             ← Script de config Kibana (optionnel)
 ├── transform_tweets.py         ← Convertit un export brut Apify vers tweets_data.json
 │
@@ -22,11 +23,40 @@ twitter-analysis/
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── sentiment_local.py      ← Analyse sentiment sans OpenAI
-│   └── consumer.py             ← Kafka → Analyse → Cassandra + ES
+│   └── consumer.py             ← Kafka → Analyse → Cassandra + ES (client kafka-python classique)
+│
+├── spark_consumer/
+│   └── ...                     ← Consumer alternatif basé sur PySpark Structured Streaming
 │
 └── init-scripts/
     └── init.cql                ← Schéma Cassandra
 ```
+
+---
+
+## ⚡ Deux versions du consumer
+
+Ce projet propose **deux implémentations** du consumer, au choix :
+
+| | `consumer/` (classique) | `spark_consumer/` (Spark) |
+|---|---|---|
+| **Technologie** | Client `kafka-python` | PySpark Structured Streaming |
+| **Traitement** | Message par message | Micro-batchs (streaming) |
+| **Écriture** | Directe vers Cassandra + Elasticsearch | Via `foreachBatch` vers Cassandra + Elasticsearch |
+| **Cas d'usage** | Simple, léger, rapide à démarrer | Passage à l'échelle, traitement distribué |
+
+Les deux consumers lisent le même topic Kafka et écrivent dans les mêmes tables Cassandra / index Elasticsearch — tu peux utiliser l'un ou l'autre selon le besoin (démo simple vs démonstration de traitement distribué type Big Data).
+
+### Lancer la version Spark
+
+```bash
+# Dans docker-compose.yml, remplacer le service "consumer" par "spark_consumer"
+# ou lancer les deux séparément selon la configuration du projet
+
+docker compose up spark_consumer --build
+```
+
+> ℹ️ Complète cette section avec les instructions précises de ton dossier `spark_consumer/` (dépendances PySpark, variables d'environnement spécifiques, etc.) si elles diffèrent du consumer classique.
 
 ---
 
@@ -115,6 +145,8 @@ OPENAI_API_KEY=    # laisser vide
 USE_OPENAI=true
 OPENAI_API_KEY=sk-VOTRE_VRAIE_CLE
 ```
+
+> ⚠️ Le fichier `.env` contient des informations sensibles (clés API) et **ne doit jamais être versionné**. Il est exclu via `.gitignore`.
 
 ### Étape 4 : Lancer tous les services
 
