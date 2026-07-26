@@ -1,5 +1,5 @@
 # 🐦 Analyse des Tweets en Temps Réel
-### Stack : Apache Kafka · Cassandra · Elasticsearch · Kibana · OpenAI (optionnel)
+### Stack : Apache Kafka · Cassandra · Elasticsearch · Kibana · OpenAI 
 
 ---
 
@@ -8,8 +8,8 @@
 ```
 twitter-analysis/
 ├── docker-compose.yml          ← Tous les services
-├── .env                        ← Configuration (clés API, etc.) — NON versionné (voir .gitignore)
-├── .gitignore                  ← Fichiers exclus du dépôt (.env, etc.)
+├── .env                        ← Configuration (clés API, etc.) 
+├── .gitignore                  ← Fichiers exclus du dépôt 
 ├── setup_kibana.sh             ← Script de config Kibana (optionnel)
 ├── transform_tweets.py         ← Convertit un export brut Apify vers tweets_data.json
 │
